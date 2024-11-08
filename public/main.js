@@ -21,7 +21,7 @@ function initializeSocket() {
             await createOffer();
         }
         else {
-            console.log('Жду оффер как п��лучатель');
+            console.log('Жду оффер как плучатель');
         }
     });
     socket.on('offer', async (offer) => {
@@ -60,6 +60,9 @@ function initializeSocket() {
     socket.on('disconnect', () => {
         console.log('Отключено от сервера');
         updateConnectionStatus(false);
+    });
+    socket.on('chat-message', (messageData) => {
+        addMessageToChat(messageData, false);
     });
 }
 function updateConnectionStatus(isConnected) {
@@ -174,8 +177,39 @@ export async function joinRoom() {
     await initializeCall();
     socket.emit('join-room', roomId);
 }
+// Добавим функцию отправки сообщений
+export async function sendMessage() {
+    const messageInput = document.getElementById('messageInput');
+    const message = messageInput.value.trim();
+    if (message && currentRoom) {
+        const messageData = {
+            text: message,
+            time: new Date().toLocaleTimeString(),
+            sender: socket.id,
+        };
+        // Добавляем сообщение локально
+        addMessageToChat(messageData, true);
+        // Отправляем сообщение другому пользователю
+        socket.emit('chat-message', messageData, currentRoom);
+        // Очищаем поле ввода
+        messageInput.value = '';
+    }
+}
+// Функция добавления сообщения в чат
+function addMessageToChat(messageData, isSent) {
+    const chatMessages = document.getElementById('chatMessages');
+    const messageElement = document.createElement('div');
+    messageElement.className = `message ${isSent ? 'sent' : 'received'}`;
+    messageElement.innerHTML = `
+    <div class="text">${messageData.text}</div>
+    <div class="time">${messageData.time}</div>
+  `;
+    chatMessages?.appendChild(messageElement);
+    chatMessages?.scrollTo(0, chatMessages.scrollHeight);
+}
 // Инициализируем при загрузке
 document.addEventListener('DOMContentLoaded', () => {
     initializeSocket();
     window.joinRoom = joinRoom;
+    window.sendMessage = sendMessage;
 });

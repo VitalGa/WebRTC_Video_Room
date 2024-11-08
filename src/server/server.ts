@@ -77,6 +77,13 @@ io.on('connection', (socket) => {
     socket.to(roomId).emit('ice-candidate', candidate);
   });
 
+  socket.on(
+    'chat-message',
+    (messageData: { text: string; time: string; sender: string }, roomId: string) => {
+      socket.to(roomId).emit('chat-message', messageData);
+    },
+  );
+
   socket.on('disconnect', () => {
     rooms.forEach((room, roomId) => {
       const index = room.users.indexOf(socket.id);

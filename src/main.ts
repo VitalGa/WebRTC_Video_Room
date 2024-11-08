@@ -27,7 +27,7 @@ function initializeSocket() {
       console.log('Создаю оффер как инициатор');
       await createOffer();
     } else {
-      console.log('Жду оффер как п��лучатель');
+      console.log('Жду оффер как плучатель');
     }
   });
 
@@ -69,6 +69,10 @@ function initializeSocket() {
   socket.on('disconnect', () => {
     console.log('Отключено от сервера');
     updateConnectionStatus(false);
+  });
+
+  socket.on('chat-message', (messageData: { text: string; time: string; sender: string }) => {
+    addMessageToChat(messageData, false);
   });
 }
 
@@ -192,15 +196,58 @@ export async function joinRoom() {
   socket.emit('join-room', roomId);
 }
 
+// Добавим функцию отправки сообщений
+export async function sendMessage() {
+  const messageInput = document.getElementById('messageInput') as HTMLInputElement;
+  const message = messageInput.value.trim();
+
+  if (message && currentRoom) {
+    const messageData = {
+      text: message,
+      time: new Date().toLocaleTimeString(),
+      sender: socket.id,
+    };
+
+    // Добавляем сообщение локально
+    addMessageToChat(messageData, true);
+
+    // Отправляем сообщение другому пользователю
+    socket.emit('chat-message', messageData, currentRoom);
+
+    // Очищаем поле ввода
+    messageInput.value = '';
+  }
+}
+
+// Функция добавления сообщения в чат
+function addMessageToChat(
+  messageData: { text: string; time: string; sender: string },
+  isSent: boolean,
+) {
+  const chatMessages = document.getElementById('chatMessages');
+  const messageElement = document.createElement('div');
+  messageElement.className = `message ${isSent ? 'sent' : 'received'}`;
+
+  messageElement.innerHTML = `
+    <div class="text">${messageData.text}</div>
+    <div class="time">${messageData.time}</div>
+  `;
+
+  chatMessages?.appendChild(messageElement);
+  chatMessages?.scrollTo(0, chatMessages.scrollHeight);
+}
+
 // Инициализируем при загрузке
 document.addEventListener('DOMContentLoaded', () => {
   initializeSocket();
   window.joinRoom = joinRoom;
+  window.sendMessage = sendMessage;
 });
 
 // Добавляем определение для TypeScript
 declare global {
   interface Window {
     joinRoom: typeof joinRoom;
+    sendMessage: typeof sendMessage;
   }
 }

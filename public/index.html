@@ -13,25 +13,38 @@
         <div class="status-badge status-disconnected" id="connectionStatus">Не подключен</div>
       </div>
 
-      <div class="video-container">
-        <video id="localVideo" autoplay playsinline muted></video>
-        <video id="remoteVideo" autoplay playsinline></video>
-      </div>
+      <div class="main-content">
+        <div class="video-section">
+          <div class="video-container">
+            <video id="localVideo" autoplay playsinline muted></video>
+            <video id="remoteVideo" autoplay playsinline></video>
+          </div>
 
-      <div class="controls">
-        <input type="text" id="roomId" placeholder="Введите ID комнаты" />
-        <button onclick="joinRoom()">Присоединиться</button>
-      </div>
+          <div class="controls">
+            <input type="text" id="roomId" placeholder="Введите ID комнаты" />
+            <button onclick="joinRoom()">Присоединиться</button>
+          </div>
 
-      <div class="connection-status" id="statusMessage">
-        Введите ID комнаты для начала разговора
+          <div class="connection-status" id="statusMessage">
+            Введите ID комнаты для начала разговора
+          </div>
+        </div>
+
+        <div class="chat-container">
+          <div class="chat-messages" id="chatMessages"></div>
+          <div class="chat-input-container">
+            <input type="text" id="messageInput" placeholder="Введите сообщение..." />
+            <button onclick="sendMessage()">Отправить</button>
+          </div>
+        </div>
       </div>
     </div>
 
     <script src="https://cdn.socket.io/4.5.4/socket.io.min.js"></script>
     <script type="module">
-      import { joinRoom } from './main.js';
+      import { joinRoom, sendMessage } from './main.js';
       window.joinRoom = joinRoom;
+      window.sendMessage = sendMessage;
     </script>
   </body>
 </html>
