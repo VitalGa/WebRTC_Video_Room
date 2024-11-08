@@ -27,7 +27,7 @@ function initializeSocket() {
       console.log('Создаю оффер как инициатор');
       await createOffer();
     } else {
-      console.log('Жду оффер как получатель');
+      console.log('Жду оффер как п��лучатель');
     }
   });
 
@@ -58,12 +58,37 @@ function initializeSocket() {
 
   socket.on('user-disconnected', () => {
     console.log('Другой пользователь отключился');
+    updateConnectionStatus(false);
     const remoteVideo = document.getElementById('remoteVideo') as HTMLVideoElement;
     if (remoteVideo.srcObject) {
       (remoteVideo.srcObject as MediaStream).getTracks().forEach((track) => track.stop());
       remoteVideo.srcObject = null;
     }
   });
+
+  socket.on('disconnect', () => {
+    console.log('Отключено от сервера');
+    updateConnectionStatus(false);
+  });
+}
+
+function updateConnectionStatus(isConnected: boolean) {
+  const statusBadge = document.getElementById('connectionStatus');
+  const statusMessage = document.getElementById('statusMessage');
+
+  if (statusBadge && statusMessage) {
+    if (isConnected) {
+      statusBadge.classList.remove('status-disconnected');
+      statusBadge.classList.add('status-connected');
+      statusBadge.textContent = 'Подключен';
+      statusMessage.textContent = 'Видеосвязь установлена';
+    } else {
+      statusBadge.classList.remove('status-connected');
+      statusBadge.classList.add('status-disconnected');
+      statusBadge.textContent = 'Не подключен';
+      statusMessage.textContent = 'Введите ID комнаты для начала разговора';
+    }
+  }
 }
 
 async function initializeCall() {
@@ -82,6 +107,19 @@ async function initializeCall() {
       }
     };
 
+    // Добавляем обработчик состояния подключения
+    peerConnection.onconnectionstatechange = () => {
+      console.log('Connection state:', peerConnection?.connectionState);
+      if (peerConnection?.connectionState === 'connected') {
+        updateConnectionStatus(true);
+      } else if (
+        peerConnection?.connectionState === 'disconnected' ||
+        peerConnection?.connectionState === 'failed'
+      ) {
+        updateConnectionStatus(false);
+      }
+    };
+
     localStream.getTracks().forEach((track) => {
       if (localStream && peerConnection) {
         peerConnection.addTrack(track, localStream);
@@ -91,9 +129,12 @@ async function initializeCall() {
     peerConnection.ontrack = (event) => {
       const remoteVideo = document.getElementById('remoteVideo') as HTMLVideoElement;
       remoteVideo.srcObject = event.streams[0];
+      // Обновляем статус при получении видеопотока
+      updateConnectionStatus(true);
     };
   } catch (error) {
     console.error('Ошибка при инициализации медиа:', error);
+    updateConnectionStatus(false);
   }
 }
 
