@@ -1,0 +1,24 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="UTF-8" />
+    <title>Чат-комната</title>
+    <!-- Добавьте type="module" -->
+    <script type="module">
+      import { joinRoom } from './main.js';
+
+      // Сделайте функцию доступной глобально, если она нужна в onclick
+      window.joinRoom = joinRoom;
+    </script>
+  </head>
+  <body>
+    <!-- Или измените кнопку на: -->
+    <button id="joinButton">Join Room</button>
+
+    <script type="module">
+      import { joinRoom } from './main.js';
+
+      document.getElementById('joinButton').addEventListener('click', joinRoom);
+    </script>
+  </body>
+</html>

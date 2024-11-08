@@ -1,0 +1,29 @@
+{
+  "name": "video-chat",
+  "version": "1.0.0",
+  "type": "module",
+  "scripts": {
+    "start": "node public/server/server.js",
+    "build": "npm run clean && tsc && npm run copy-static",
+    "clean": "rimraf public/*",
+    "copy-static": "copyfiles -u 1 \"src/*.{html,css}\" public/",
+    "dev": "cross-env NODE_ENV=development nodemon",
+    "kill-port": "node scripts/kill-port.js"
+  },
+  "dependencies": {
+    "express": "^4.17.1",
+    "socket.io": "^4.5.4"
+  },
+  "devDependencies": {
+    "@types/express": "^4.17.13",
+    "@types/node": "^16.18.119",
+    "@types/socket.io-client": "^3.0.0",
+    "@types/webrtc": "^0.0.44",
+    "copyfiles": "^2.4.1",
+    "cross-env": "^7.0.3",
+    "nodemon": "^2.0.15",
+    "rimraf": "^3.0.2",
+    "ts-node": "^10.9.2",
+    "typescript": "^5.0.0"
+  }
+}

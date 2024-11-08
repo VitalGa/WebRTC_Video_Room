@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html lang="ru">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Видеочат ReCode</title>
+    <link rel="stylesheet" href="styles.css" />
+  </head>
+  <body>
+    <div class="container">
+      <div class="header">
+        <h1>Видеочат Академии ReCode</h1>
+        <div class="status-badge status-disconnected" id="connectionStatus">Не подключен</div>
+      </div>
+
+      <div class="video-container">
+        <video id="localVideo" autoplay playsinline muted></video>
+        <video id="remoteVideo" autoplay playsinline></video>
+      </div>
+
+      <div class="controls">
+        <input type="text" id="roomId" placeholder="Введите ID комнаты" />
+        <button onclick="joinRoom()">Присоединиться</button>
+      </div>
+
+      <div class="connection-status" id="statusMessage">
+        Введите ID комнаты для начала разговора
+      </div>
+    </div>
+
+    <script src="https://cdn.socket.io/4.5.4/socket.io.min.js"></script>
+    <script type="module">
+      import { joinRoom } from './main.js';
+      window.joinRoom = joinRoom;
+    </script>
+  </body>
+</html>
